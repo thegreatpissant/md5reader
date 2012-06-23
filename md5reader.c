@@ -5,9 +5,8 @@
 #include "md5reader.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-//  Debug define
-#define DEBUG_FILE
 //  Recognized formats
 #define FORMAT10 10
 
@@ -134,6 +133,11 @@ md5mesh * md5mesh_loadfile (FILE * fp)
   parseline (fp, &line, &length);
   if (sscanf (line, "%s %d", &token, &(md5meshanimal->numMeshes)) == 2)
     checkToken (token, "numMeshes", 9);
+  else
+    {
+      fprintf (stderr, "Error parsing number of meshes\n");
+      exit (EXIT_FAILURE);
+    }
 #ifdef DEBUG_FILE 
   printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
   printf ("DGB-MD5MESH_LOADFILE: numMeshes: %d\n", md5meshanimal->numMeshes);
@@ -146,11 +150,63 @@ md5mesh * md5mesh_loadfile (FILE * fp)
   parseline (fp, &line, &length);
   if (sscanf (line, "%s %s", &token, &tmpLine) == 2)
     checkToken (token, "joints", 6);
+  else
+    {
+      fprintf (stderr, "Error parsing beginig of joints section\n");
+      exit (EXIT_FAILURE);
+    }
 #ifdef DEBUG_FILE 
   printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
   printf ("DGB-MD5MESH_LOADFILE: tmpLine: %s\n", tmpLine);
 #endif
+  free (line);
+  line = NULL;
 
+  //  Assuming the number of joints is correct parse accordingly
+  int jointsParsed = 0;
+  char  jN[50];  //  Joint Name
+  int   jP;      //  Joint Parent
+  float qax;     //  Quanterion A's X
+  float qay;     //  Quanterion A's Y
+  float qaz;     //  Quanterion A's Z
+  float qbx;     //  Quanterion B's X
+  float qby;     //  Quanterion B's Y
+  float qbz;     //  Quanterion B's Z
+  int ret;
+  for ( ; jointsParsed < md5meshanimal->numJoints; ++jointsParsed)
+    {
+      parseline (fp, &line, &length);
+      memset (jN, '\n', 50);
+      ret = sscanf (line, "%s %i ( %f %f %f ) ( %f %f %f )",
+		    &jN,  &jP, &qax, &qay, &qaz, &qbx, &qby, &qbz);
+#ifdef DEBUG_FILE 
+	printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
+	printf ("DGB-MD5MESH_LOADFILE: Joint: %s %i ( %f %f %f ) ( %f %f %f )\n",
+		&jN,  &jP, &qax, &qay, &qaz, &qbx, &qby, &qbz);
+#endif
+      if (ret != 8)
+	{
+	  fprintf (stderr, "Error Parsing joint #%d\n sscanf ret: %d\n",jointsParsed, ret);
+	  exit (EXIT_FAILURE);
+	}
+      printf ("Joint: \"%s\" %i ( %f %f %f ) ( %f %f %f )\n",
+	      &jN,  &jP, &qax, &qay, &qaz, &qbx, &qby, &qbz);
+    }
+
+  parseline (fp, &line, &length);
+  if (sscanf (line, "%s", &token) == 1)
+    checkToken (token, "}", 1);
+  else
+    {
+      fprintf (stderr, "Error parsing clossing joint bracket\n");
+      exit (EXIT_FAILURE);
+    }
+#ifdef DEBUG_FILE 
+  printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
+#endif
+  free (line);
+  line = NULL;
+  
   //  Parse Meshes
 
   return md5meshanimal;
