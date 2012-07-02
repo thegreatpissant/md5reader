@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "skeleton.h"
 
 //  Recognized formats
 #define FORMAT10 10
@@ -165,32 +166,33 @@ md5mesh * md5mesh_loadfile (FILE * fp)
   //  Assuming the number of joints is correct parse accordingly
   int jointsParsed = 0;
   char  jN[50];  //  Joint Name
-  int   jP;      //  Joint Parent
-  float qax;     //  Quanterion A's X
-  float qay;     //  Quanterion A's Y
-  float qaz;     //  Quanterion A's Z
-  float qbx;     //  Quanterion B's X
-  float qby;     //  Quanterion B's Y
-  float qbz;     //  Quanterion B's Z
+  int  jP;      //  Joint Parent
+  float px;     //  Position X
+  float py;     //  Position Y
+  float pz;     //  Position Z
+  float qx;     //  Orientation X
+  float qy;     //  Orientation Y
+  float qz;     //  Orientation Z
+  float qw;     //  W component im told to calculate
   int ret;
   for ( ; jointsParsed < md5meshanimal->numJoints; ++jointsParsed)
     {
       parseline (fp, &line, &length);
       memset (jN, '\n', 50);
-      ret = sscanf (line, "%s %i ( %f %f %f ) ( %f %f %f )",
-		    &jN,  &jP, &qax, &qay, &qaz, &qbx, &qby, &qbz);
+      ret = sscanf (line, "%s %hd ( %f %f %f ) ( %f %f %f )",
+		    &jN,  &jP, &px, &py, &pz, &qx, &qy, &qz);
 #ifdef DEBUG_FILE 
 	printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
-	printf ("DGB-MD5MESH_LOADFILE: Joint: %s %i ( %f %f %f ) ( %f %f %f )\n",
-		&jN,  &jP, &qax, &qay, &qaz, &qbx, &qby, &qbz);
+	printf ("DGB-MD5MESH_LOADFILE: Joint: %s %d ( %.10f %.10f %.10f ) ( %.10f %.10f %.10f )\n",
+		jN, jP, px, py, pz, qx, qy, qz);
 #endif
-      if (ret != 8)
+	if (ret != 8)
 	{
-	  fprintf (stderr, "Error Parsing joint #%d\n sscanf ret: %d\n",jointsParsed, ret);
+	  fprintf (stderr, "Error Parsing joint #%d\n sscanf ret: %d\n",jointsParsed, ret); 
 	  exit (EXIT_FAILURE);
-	}
-      printf ("Joint: \"%s\" %i ( %f %f %f ) ( %f %f %f )\n",
-	      &jN,  &jP, &qax, &qay, &qaz, &qbx, &qby, &qbz);
+	  }
+      printf ("Joint: %s %hd ( %.10f %.10f %.10f ) ( %.10f %.10f %.10f )\n",
+	      jN,  jP, px, py, pz, qx, qy, qz);
     }
 
   parseline (fp, &line, &length);
