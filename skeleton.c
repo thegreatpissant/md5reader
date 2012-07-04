@@ -61,8 +61,8 @@ void skeletonAddJoint (struct skeleton * skel, int num, char *name, int parent,
   newJoint->orZ  = orZ;
   newJoint->w    =  0;
 
-  //  skel->joints = addJoint (skel->joints, newJoint);
-  addJoint (skel->joints, newJoint);
+  skel->joints = addJoint (skel->joints, newJoint);
+  //   addJoint (skel->joints, newJoint);
 
 }
 
