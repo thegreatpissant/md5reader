@@ -3,56 +3,56 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct skeleton *getNewSkeleton ()
+#define JOINTALLOCATION 5
+
+pskeleton getNewSkeleton ()
 {
-  struct skeleton *newSkeleton = (struct skeleton*) malloc (sizeof (struct skeleton));
-  newSkeleton->joints = (struct joint **) malloc (sizeof (struct joint*));
-  newSkeleton->joints[0] = NULL;
+  pskeleton newSkeleton = (pskeleton) malloc (sizeof (skeleton));
+  newSkeleton->joints = NULL;
+  newSkeleton->numJoints = 0;
+  newSkeleton->MAXJOINTS = 0;
   return newSkeleton;
 }
 
-struct joint ** addJoint(struct joint **joints, struct joint *newJoint)
+pskeleton addJoint(pskeleton skel, pjoint newJoint)
 {
-  struct joint **pos;
-  int i;
-  for (i = 1,pos = joints; *pos != NULL; ++pos,++i)
-    ;
-  *pos = newJoint;
-  joints = (struct joint **) realloc (joints, sizeof (struct joint*) * (i+1));
-  joints[i] = NULL;
-  return joints;
+  if (skel->numJoints == skel->MAXJOINTS)
+    {
+      skel->MAXJOINTS += JOINTALLOCATION;
+      skel->joints = (ppjoint) realloc (skel->joints, sizeof (pjoint) * skel->MAXJOINTS);
+    }
+  skel->joints[skel->numJoints++] = newJoint;
+  return skel;
 }
 
-void printSkeleton (struct skeleton * skel)
+void printSkeleton (pskeleton skel)
 {
   printf ("Printing skeleton\n");
-  struct joint ** joints = skel->joints;
-  for (; *joints != NULL; joints++)
+  int idx;
+  for (idx = 0; idx < skel->numJoints; idx++)
     {
-      printf ("Name: %s\n", (*joints)->name);
-      printf ("posx: %f\n", (*joints)->posX);
+      printf ("Name: %s\n", skel->joints[idx]->name);
+      printf ("posx: %f\n", skel->joints[idx]->posX);
     }
 }
 
-void skeletonAddJoint (struct skeleton * skel, int num, char *name, int parent, 
+void skeletonAddJoint (pskeleton skel, int num, char *name, int parent, 
 		       float posX, float posY, float posZ,
 		       float orX,  float orY,  float orZ)
 {
-  struct joint * newJoint = (struct joint*) malloc (sizeof (struct joint));
+  pjoint newJoint = (pjoint) malloc (sizeof (joint));
+  newJoint->parent = NULL;
   newJoint->name = (char*) malloc (sizeof (strlen(name)+1));
   strcpy (newJoint->name, name);
-  newJoint->children = (struct joint**) malloc (sizeof (struct joint *));
+  /*
+  newJoint->children = (ppjoint) malloc (sizeof ());
   newJoint->children[0] = NULL;
-
   if (parent != -1)
     {
       newJoint->parent = skel->joints[parent];
       addJoint(newJoint->parent->children, newJoint);
     }
-  else
-    {
-      newJoint->parent = NULL;
-    }
+  */
   newJoint->posX = posX;
   newJoint->posY = posY;
   newJoint->posZ = posZ;
@@ -61,15 +61,14 @@ void skeletonAddJoint (struct skeleton * skel, int num, char *name, int parent,
   newJoint->orZ  = orZ;
   newJoint->w    =  0;
 
-  skel->joints = addJoint (skel->joints, newJoint);
-  //   addJoint (skel->joints, newJoint);
+  addJoint (skel, newJoint);
 
 }
 
 #define NUM_JOINTS 3
 int main ()
 {
-  struct skeleton *tom = getNewSkeleton ();
+  pskeleton tom = getNewSkeleton ();
 
   char *jointName1 = "arm";
   char *jointName2 = "hand";
@@ -95,5 +94,5 @@ int main ()
 
   
   printSkeleton (tom);
-
+  return 0;
 }
