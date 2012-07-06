@@ -28,7 +28,9 @@ struct _skeleton
 
 pskeleton getNewSkeleton ();
 
-void skeletonAddJoint (pskeleton skel, int num, char *name, int parent, 
+void skeletonAddJoint (pskeleton skel, char *name, int parent, 
 		       float posX, float posY, float posZ,
 		       float orX,  float orY,  float orZ);
+
+void printSkeleton (pskeleton skel);
 #endif

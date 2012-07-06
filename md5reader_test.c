@@ -3,6 +3,7 @@
 */
 
 #include "md5reader.h"
+#include "skeleton.h"
 #include <stdio.h>
 #include <stdlib.h>
 int main (int argc, char **argv)
@@ -20,11 +21,8 @@ int main (int argc, char **argv)
       fprintf (stderr, "Error opening file\n");
       exit (EXIT_FAILURE);
     }
-  md5mesh *mymesh;
-  mymesh = md5mesh_loadfile (md5mesh_file);
-  printf ("md5mesh.fileVersion: %d\n", mymesh->fileVersion);
-  printf ("md5mesh.numJoints:   %d\n", mymesh->numJoints);
-  printf ("md5mesh.numMeshes:   %d\n", mymesh->numMeshes);
-
+  pskeleton mySkeleton;
+  mySkeleton = md5mesh_loadfile (md5mesh_file);
+  printSkeleton (mySkeleton);
   return 0;
 }

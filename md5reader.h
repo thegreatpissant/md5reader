@@ -1,26 +1,16 @@
 /**
- * Reads in a md5mesh file returning a struct to the model
+ * Reads in a md5mesh file returning a struct to a skeleton
  */
 
 #ifndef __MD5__READER__
 #define __MD5__READER__
 
+#include "skeleton.h"
 #include <stdio.h>
 
 /**
- * Holds all md5mesh model data from file.
+ *  As skeleton becomes more complete, these will disapear.
  */
-typedef struct
-{
-  char * name;
-  int parent;
-  int posx;
-  int posy;
-  int posz;
-  int orientx;
-  int orienty;
-  int orientz;
-} joint;
 
 typedef struct
 {
@@ -47,6 +37,10 @@ typedef struct
 } mesh;
 
   
+/** @@TODO
+ *  Do we need to hold on to this, debug purposes??
+ *  For now we discard
+ */
 typedef struct
 {
   int   fileVersion;
@@ -63,6 +57,6 @@ typedef struct
  * @param fp [in] FILE* to file name
  * @return md5mesh struct
  */
-md5mesh * md5mesh_loadfile (FILE * fp);
+pskeleton md5mesh_loadfile (FILE * fp);
 
 #endif
