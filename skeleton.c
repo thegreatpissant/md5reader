@@ -4,6 +4,7 @@
 #include <string.h>
 
 #define JOINTALLOCATION 5
+#define CHILDALLOCATION 2
 
 pskeleton getNewSkeleton ()
 {
@@ -24,15 +25,31 @@ pskeleton addJoint(pskeleton skel, pjoint newJoint)
   skel->joints[skel->numJoints++] = newJoint;
   return skel;
 }
-
+void addChild (pskeleton skel, int pos, pjoint childJoint)
+{
+  if (skel->joints[pos]->numChildren == skel->joints[pos]->MAXCHILDREN)
+    {
+      skel->joints[pos]->MAXCHILDREN += CHILDALLOCATION;
+      skel->joints[pos]->children = (ppjoint) realloc(skel->joints[pos]->children, skel->joints[pos]->MAXCHILDREN * sizeof (pjoint));
+    }
+  skel->joints[pos]->children[skel->joints[pos]->numChildren++] = childJoint;
+}
 void printSkeleton (pskeleton skel)
 {
   printf ("Printing skeleton\n");
-  int idx;
+  int idx, idy;
   for (idx = 0; idx < skel->numJoints; idx++)
     {
       printf ("Name: %s\n", skel->joints[idx]->name);
       printf ("posx: %f\n", skel->joints[idx]->posX);
+      printf ("posy: %f\n", skel->joints[idx]->posY);
+      printf ("posz: %f\n", skel->joints[idx]->posZ);
+      printf ("orx: %f\n", skel->joints[idx]->orX);
+      printf ("ory: %f\n", skel->joints[idx]->orY);
+      printf ("orz: %f\n", skel->joints[idx]->orZ);
+      printf ("w: %f\n", skel->joints[idx]->w);
+      for (idy = 0; idy < skel->joints[idx]->numChildren; idy++)
+	printf ("Child name: %s\n", skel->joints[idx]->children[idy]->name);
     }
 }
 
@@ -44,15 +61,15 @@ void skeletonAddJoint (pskeleton skel, int num, char *name, int parent,
   newJoint->parent = NULL;
   newJoint->name = (char*) malloc (sizeof (strlen(name)+1));
   strcpy (newJoint->name, name);
-  /*
-  newJoint->children = (ppjoint) malloc (sizeof ());
-  newJoint->children[0] = NULL;
+  newJoint->children = NULL;
+  newJoint->numChildren = 0;
+  newJoint->MAXCHILDREN = 0;
   if (parent != -1)
     {
       newJoint->parent = skel->joints[parent];
-      addJoint(newJoint->parent->children, newJoint);
+      addChild(skel, parent, newJoint);
     }
-  */
+
   newJoint->posX = posX;
   newJoint->posY = posY;
   newJoint->posZ = posZ;

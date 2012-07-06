@@ -1,11 +1,14 @@
 #ifndef __SKELETON_H_
 #define __SKELETON_H_
 
-typedef struct _joint
+typedef struct _joint joint, *pjoint, **ppjoint;
+struct _joint
 {
   char *name;
-  struct joint *parent;
-  struct joint **children;
+  pjoint parent;
+  ppjoint children;
+  int numChildren;
+  int MAXCHILDREN;
   float posX;
   float posY;
   float posZ;
@@ -13,14 +16,15 @@ typedef struct _joint
   float orY;
   float orZ;
   float w;
-} joint, *pjoint, **ppjoint;
+} ;
 
-typedef struct _skeleton
+typedef struct _skeleton skeleton, *pskeleton, **ppskeleton;
+struct _skeleton
 {
   int numJoints;
   int MAXJOINTS;
   ppjoint joints;
-} skeleton, *pskeleton, **ppskeleton;
+} ;
 
 pskeleton getNewSkeleton ();
 
