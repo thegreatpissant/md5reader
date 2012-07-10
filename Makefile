@@ -6,7 +6,7 @@ TEST_EXECS = md5reader_test skeleton_test
 OBJ_FILES = md5reader.o skeleton.o 
 EDITOR_MESS = *~ \#*
 
-all: 
+all: $(ALL_EXECS)
 
 skeleton.o: skeleton.c skeleton.h
 	gcc $(DEBUG_FLAG) -c skeleton.c 
