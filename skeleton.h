@@ -33,4 +33,5 @@ void skeletonAddJoint (pskeleton skel, char *name, int parent,
 		       float orX,  float orY,  float orZ);
 
 void printSkeleton (pskeleton skel);
+void skeletonCleanUp (pskeleton skel);
 #endif
