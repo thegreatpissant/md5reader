@@ -62,12 +62,12 @@ void skeletonAddJoint (pskeleton skel, char *name, int parent,
 {
   pjoint newJoint = (pjoint) malloc (sizeof (joint));
   newJoint->parent = NULL;
-  newJoint->name = (char*) malloc (sizeof (strlen(name)+1));
-  newJoint->name[strlen(name)] = '\0';
+  newJoint->name = (char*) malloc (sizeof (char) * (strlen(name)+1));
   strcpy (newJoint->name, name);
   newJoint->children = NULL;
   newJoint->numChildren = 0;
   newJoint->MAXCHILDREN = 0;
+
   if (parent != -1)
     {
       newJoint->parent = skel->joints[parent];

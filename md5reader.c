@@ -191,8 +191,10 @@ pskeleton md5mesh_loadfile (FILE * fp)
 	  exit (EXIT_FAILURE);
 	}
 	
-	printf ("Joint: %s %hd ( %.10f %.10f %.10f ) ( %.10f %.10f %.10f )\n",
+	/*
+	  printf ("Joint: %s %hd ( %.10f %.10f %.10f ) ( %.10f %.10f %.10f )\n",
 		jN,  jP, px, py, pz, qx, qy, qz);
+	*/
 	
 	skeletonAddJoint (newSkeleton, jN, jP, px, py, pz, qz, qy, qz);
     }
