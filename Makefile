@@ -16,8 +16,6 @@ md5reader.o: md5reader.c md5reader.h
 	gcc $(DEBUG_FLAG) -c md5reader.c
 md5reader_test: md5reader.o skeleton.o
 	gcc $(DEBUG_FLAG) -o md5reader_test md5reader_test.c md5reader.o skeleton.o
-dynamic_array.o:
-
 tests: $(TEST_EXECS)
 
 clean: 
