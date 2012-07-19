@@ -21,6 +21,7 @@ struct _joint
 typedef struct _skeleton skeleton, *pskeleton, **ppskeleton;
 struct _skeleton
 {
+  char * name;
   int numJoints;
   int MAXJOINTS;
   ppjoint joints;
