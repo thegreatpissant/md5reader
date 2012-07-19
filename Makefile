@@ -6,7 +6,7 @@ TEST_EXECS = md5reader_test skeleton_test
 OBJ_FILES = md5reader.o skeleton.o 
 EDITOR_MESS = *~ \#*
 
-all: $(ALL_EXECS)
+all: $(ALL_EXECS) $(TEST_EXECS)
 
 objs: $(OBJ_FILES)
 
