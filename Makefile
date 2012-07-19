@@ -8,6 +8,9 @@ EDITOR_MESS = *~ \#*
 
 all: $(ALL_EXECS) $(TEST_EXECS)
 
+objs: $(OBJ_FILES)
+
+
 skeleton.o: skeleton.c skeleton.h
 	gcc $(DEBUG_FLAG) -c skeleton.c 
 skeleton_test: skeleton.o

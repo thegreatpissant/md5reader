@@ -7,6 +7,7 @@ int main ()
 {
   pskeleton tom = getNewSkeleton (10);
 
+  tom->name = "tom";
   char *jointName1 = "arm";
   char *jointName2 = "hand";
   char *jointName3 = "finger";
@@ -34,7 +35,7 @@ int main ()
 			2.01,3.01,4.01);
 
     }  
-  /*  printSkeleton (tom); */
+  printSkeleton (tom);
   skeletonCleanUp (tom);
   return 0;
 }

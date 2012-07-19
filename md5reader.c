@@ -30,6 +30,8 @@ char * md510tokens[] = {
   "joints",
 };
 
+static char * md5basename (char * name);
+
 static void parseline (FILE *fp, char **line, size_t *length)
 {
   size_t ret = 0;
@@ -73,11 +75,21 @@ static void checkToken (char *ptoken, char *token, int len)
     }
 }
 
-pskeleton md5mesh_loadfile (FILE * fp)
+pskeleton md5mesh_loadfile (char * fn)
 {
+  FILE * fp;
+  fp = fopen (fn, "r");
+  if (fp == NULL)
+    {
+      fprintf (stderr, "Error opening file\n");
+      exit (EXIT_FAILURE);
+    }
+
   /*  A blank mesh object to populate */
   md5mesh * md5meshanimal = (md5mesh *)malloc (sizeof (md5mesh));
   pskeleton newSkeleton;
+
+
 
   /*  Parser token always used */
   char token[25];
@@ -216,5 +228,23 @@ pskeleton md5mesh_loadfile (FILE * fp)
   line = NULL;
   
   free (md5meshanimal);
+  newSkeleton->name = md5basename (fn);
+
   return newSkeleton;
+}
+
+static char * md5basename (char * name)
+{
+  char * basename;
+  char * backtick;
+  size_t base_len;
+  if ( ((backtick = strrchr (name, '\\')) != NULL) || ((backtick = strrchr (name, '/')) != NULL) )
+       backtick += 1;
+  else 
+    backtick = name;
+  base_len = strlen (backtick) - strlen (strrchr (name, '.'));
+  basename = (char *) malloc (base_len +1);
+  strncpy (basename, backtick, base_len);
+  basename[base_len] = '\0';
+  return basename;
 }
