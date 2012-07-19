@@ -9,12 +9,12 @@
 static void addChild (pskeleton skel, int pos, pjoint childJoint);
 static pskeleton addJoint(pskeleton skel, pjoint newJoint);
 
-pskeleton getNewSkeleton ()
+pskeleton getNewSkeleton (int maxJoints)
 {
   pskeleton newSkeleton = (pskeleton) malloc (sizeof (skeleton));
-  newSkeleton->joints = NULL;
   newSkeleton->numJoints = 0;
-  newSkeleton->MAXJOINTS = 0;
+  newSkeleton->MAXJOINTS = maxJoints;
+  newSkeleton->joints = (ppjoint) malloc (sizeof (pjoint) * newSkeleton->MAXJOINTS);
   return newSkeleton;
 }
 

@@ -5,7 +5,7 @@
 #define NUM_JOINTS 3
 int main ()
 {
-  pskeleton tom = getNewSkeleton ();
+  pskeleton tom = getNewSkeleton (10);
 
   char *jointName1 = "arm";
   char *jointName2 = "hand";

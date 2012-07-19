@@ -26,7 +26,7 @@ struct _skeleton
   ppjoint joints;
 } ;
 
-pskeleton getNewSkeleton ();
+pskeleton getNewSkeleton (int maxJoints);
 
 void skeletonAddJoint (pskeleton skel, char *name, int parent, 
 		       float posX, float posY, float posZ,

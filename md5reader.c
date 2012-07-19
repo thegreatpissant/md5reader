@@ -77,7 +77,7 @@ pskeleton md5mesh_loadfile (FILE * fp)
 {
   /*  A blank mesh object to populate */
   md5mesh * md5meshanimal = (md5mesh *)malloc (sizeof (md5mesh));
-  pskeleton newSkeleton = getNewSkeleton();
+  pskeleton newSkeleton;
 
   /*  Parser token always used */
   char token[25];
@@ -128,6 +128,8 @@ pskeleton md5mesh_loadfile (FILE * fp)
 #endif
   free (line);
   line = NULL;
+
+  newSkeleton = getNewSkeleton(md5meshanimal->numJoints);
 
   /*  Parse Number of meshes */
   parseline (fp, &line, &length);
