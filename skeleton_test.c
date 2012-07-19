@@ -5,7 +5,7 @@
 #define NUM_JOINTS 3
 int main ()
 {
-  pskeleton tom = getNewSkeleton (10);
+  pskeleton tom = getNewSkeleton (0);
 
   tom->name = "tom";
   char *jointName1 = "arm";
@@ -18,7 +18,7 @@ int main ()
 		    1,2,3,
 		    2,3,4);
   int dxi;
-  for (dxi = 0; dxi < 10000; dxi++)
+  for (dxi = 0; dxi < 100000; dxi++)
     {
 
       skeletonAddJoint (tom, jointName2, 0,
@@ -35,7 +35,7 @@ int main ()
 			2.01,3.01,4.01);
 
     }  
-  printSkeleton (tom);
+  //  printSkeleton (tom);
   skeletonCleanUp (tom);
   return 0;
 }

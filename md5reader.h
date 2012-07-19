@@ -57,7 +57,6 @@ typedef struct
  * @param fp [in] FILE* to file name
  * @return md5mesh struct
  */
-
 pskeleton md5mesh_loadfile (char * fn);
 
 #endif

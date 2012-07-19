@@ -97,7 +97,9 @@ pskeleton md5mesh_loadfile (char * fn)
   char *line = NULL;
   size_t length = 0;
 
-  /*  Parse version */
+  /*
+   *  Parse version 
+   */
   parseline (fp, &line, &length);
   if (sscanf (line, "%s %d",&token, &(md5meshanimal->fileVersion)) == 2)
     checkToken (token, "MD5Version",10);
@@ -108,7 +110,9 @@ pskeleton md5mesh_loadfile (char * fn)
   free (line);
   line = NULL;
 
-  /*  Parse "commandline %s" line out */
+  /*
+   *  Parse "commandline %s" line out 
+   */
   parseline (fp, &line, &length);
   if (sscanf (line, "%s %s", &token, &commandline) == 2) 
     checkToken (token, "commandline", 11);
@@ -124,7 +128,9 @@ pskeleton md5mesh_loadfile (char * fn)
   free (line);
   line = NULL;
 
-  /*  Parse Number of Joints */
+  /*
+   *  Parse Number of Joints 
+   */
   parseline (fp, &line, &length);
   if (sscanf (line, "%s %d", &token, &(md5meshanimal->numJoints)) == 2)
     checkToken (token, "numJoints", 9);
@@ -143,7 +149,9 @@ pskeleton md5mesh_loadfile (char * fn)
 
   newSkeleton = getNewSkeleton(md5meshanimal->numJoints);
 
-  /*  Parse Number of meshes */
+  /*
+   *  Parse Number of meshes 
+   */
   parseline (fp, &line, &length);
   if (sscanf (line, "%s %d", &token, &(md5meshanimal->numMeshes)) == 2)
     checkToken (token, "numMeshes", 9);
@@ -159,7 +167,9 @@ pskeleton md5mesh_loadfile (char * fn)
   free (line);
   line = NULL;
   
-  /*  Parse joints */
+  /*
+   *  Parse joints 
+   */
   char tmpLine[255];
   parseline (fp, &line, &length);
   if (sscanf (line, "%s %s", &token, &tmpLine) == 2)
@@ -176,10 +186,12 @@ pskeleton md5mesh_loadfile (char * fn)
   free (line);
   line = NULL;
 
-  /*  Assuming the number of joints is correct parse accordingly */
+  /*  
+   * Assuming the number of joints is correct parse accordingly 
+   */
   int jointsParsed = 0;
   char  jN[50]; /*  Joint Name   */
-  int  jP;      /*  Joint Parent */
+  int   jP;     /*  Joint Parent */
   float px;     /*  Position X   */
   float py;     /*  Position Y   */
   float pz;     /*  Position Z   */
@@ -213,12 +225,15 @@ pskeleton md5mesh_loadfile (char * fn)
 	skeletonAddJoint (newSkeleton, jN, jP, px, py, pz, qz, qy, qz);
     }
 
+  /*
+   * Parse end of joint section
+   */
   parseline (fp, &line, &length);
   if (sscanf (line, "%s", &token) == 1)
     checkToken (token, "}", 1);
   else
     {
-      fprintf (stderr, "Error parsing clossing joint bracket\n");
+      fprintf (stderr, "Error parsing closing joint bracket\n");
       exit (EXIT_FAILURE);
     }
 #ifdef DEBUG_FILE 
@@ -227,6 +242,14 @@ pskeleton md5mesh_loadfile (char * fn)
   free (line);
   line = NULL;
   
+  /*
+   * Parse Mesh sections
+   */
+
+  /*
+   * Done Parsing 
+   */
+
   free (md5meshanimal);
   newSkeleton->name = md5basename (fn);
 
