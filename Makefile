@@ -17,7 +17,7 @@ skeleton.o: skeleton.c skeleton.h
 skeleton_test: skeleton.o skeleton.c skeleton.h
 	gcc $(DEBUG_FLAG) -o skeleton_test skeleton_test.c skeleton.o
 
-md5reader.o: md5reader.c md5reader.h 
+md5reader.o: md5reader.c md5reader.h model.h model_formats.h mesh.h
 	gcc $(DEBUG_FLAG) -c md5reader.c
 
 md5reader_test: md5reader.o skeleton.o md5reader_test.c 
