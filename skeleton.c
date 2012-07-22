@@ -15,6 +15,7 @@ pskeleton getNewSkeleton (int maxJoints)
   newSkeleton->numJoints = 0;
   newSkeleton->MAXJOINTS = maxJoints;
   newSkeleton->joints = (ppjoint) malloc (sizeof (pjoint) * newSkeleton->MAXJOINTS);
+  newSkeleton->name = "DEFAULTNAME";
   return newSkeleton;
 }
 
