@@ -3,6 +3,7 @@
  */
 
 #define _GNU_SOURCE
+#include "model.h"
 #include "md5reader.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +33,7 @@ char * md510tokens[] = {
 
 static char * md5basename (char * name);
 
-static void parseline (FILE *fp, char **line, size_t *length)
+static int parseline (FILE *fp, char **line, size_t *length)
 {
   size_t ret = 0;
   int blank = 1;
@@ -53,8 +54,7 @@ static void parseline (FILE *fp, char **line, size_t *length)
     }
   if (ret == -1)
     {
-      fprintf (stderr, "error reading from file\n");
-      exit (EXIT_FAILURE);
+      return -1;
     }
 #ifdef DEBUG_FILE
   printf ("DBG-PARSE_LINE: Line length: %d\n", *length);
@@ -62,7 +62,7 @@ static void parseline (FILE *fp, char **line, size_t *length)
 #endif
 }
 
-static void checkToken (char *ptoken, char *token, int len)
+static int checkToken (char *ptoken, char *token, int len)
 {
 #ifdef DEBUG_FILE
   printf ("DBG-CHECKTOKEN: ptoken: %s, token %s\n",ptoken, token);
@@ -71,42 +71,36 @@ static void checkToken (char *ptoken, char *token, int len)
     {
       fprintf (stderr, "Expected \"%s\" token; got \"%s\" token\n", token, ptoken);
       fprintf (stderr, "Check this file is formated correctly\n");
-      exit (EXIT_FAILURE);
+      return -1;
     }
 }
 
-pskeleton md5mesh_loadfile (char * fn)
+pmd5info md5meshfile_loadinfo (pmd5meshfile meshfile)
 {
-  FILE * fp;
-  fp = fopen (fn, "r");
-  if (fp == NULL)
-    {
-      fprintf (stderr, "Error opening file\n");
-      exit (EXIT_FAILURE);
-    }
-
-  /*  A blank mesh object to populate */
-  md5mesh * md5meshanimal = (md5mesh *)malloc (sizeof (md5mesh));
-  pskeleton newSkeleton;
-
-
-
+  FILE * fp = meshfile->fp;
   /*  Parser token always used */
   char token[25];
   char commandline[2458];
   char *line = NULL;
   size_t length = 0;
-
+  int fileVersion;
+  int numJoints;
+  int numMeshes;
+  pmd5info md5MeshInfo; 
+  /* to the begining of the file */
+  rewind (fp);
   /*
    *  Parse version 
    */
-  parseline (fp, &line, &length);
-  if (sscanf (line, "%s %d",&token, &(md5meshanimal->fileVersion)) == 2)
-    checkToken (token, "MD5Version",10);
-#ifdef DEBUG_FILE
-  printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
-  printf ("DGB-MD5MESH_LOADFILE: Version: %d\n", md5meshanimal->fileVersion);
-#endif
+  do 
+    {  
+      if (parseline (fp, &line, &length) == -1)
+	{
+	  fprintf (stderr, "Error reading Version, bad file\n");
+	  return NULL;
+	}
+    } while (sscanf (line, "MD5Version %d", &fileVersion) != 1);
+
   free (line);
   line = NULL;
 
@@ -114,12 +108,10 @@ pskeleton md5mesh_loadfile (char * fn)
    *  Parse "commandline %s" line out 
    */
   parseline (fp, &line, &length);
-  if (sscanf (line, "%s %s", &token, &commandline) == 2) 
-    checkToken (token, "commandline", 11);
-  else
+  if (sscanf (line, "commandline %s",&commandline) != 1) 
     {
       fprintf (stderr, "Error reading commandline\n");
-      exit (EXIT_FAILURE);
+      return NULL;
     }
 #ifdef DEBUG_FILE
   printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
@@ -132,57 +124,64 @@ pskeleton md5mesh_loadfile (char * fn)
    *  Parse Number of Joints 
    */
   parseline (fp, &line, &length);
-  if (sscanf (line, "%s %d", &token, &(md5meshanimal->numJoints)) == 2)
-    checkToken (token, "numJoints", 9);
-  else
+  if (sscanf (line, "numJoints %d", &numJoints) != 1)
     {
       fprintf (stderr, "Error reading numJoints\n");
       printf ("line: %s\n", line);
-      exit (EXIT_FAILURE);
+      return NULL;
     }
 #ifdef DEBUG_FILE
   printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
-  printf ("DGB-MD5MESH_LOADFILE: numJoints: %d\n", md5meshanimal->numJoints);
+  printf ("DGB-MD5MESH_LOADFILE: numJoints: %d\n", numJoints);
 #endif
   free (line);
   line = NULL;
-
-  newSkeleton = getNewSkeleton(md5meshanimal->numJoints);
 
   /*
    *  Parse Number of meshes 
    */
   parseline (fp, &line, &length);
-  if (sscanf (line, "%s %d", &token, &(md5meshanimal->numMeshes)) == 2)
-    checkToken (token, "numMeshes", 9);
-  else
+  if (sscanf (line, "numMeshes %d", &numMeshes) != 1)
     {
       fprintf (stderr, "Error parsing number of meshes\n");
-      exit (EXIT_FAILURE);
+      fprintf (stderr, "line: %s", line);
+      return NULL;
     }
 #ifdef DEBUG_FILE 
   printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
-  printf ("DGB-MD5MESH_LOADFILE: numMeshes: %d\n", md5meshanimal->numMeshes);
+  printf ("DGB-MD5MESH_LOADFILE: numMeshes: %d\n", numMeshes);
 #endif
   free (line);
   line = NULL;
-  
+
+  md5MeshInfo = (pmd5info) malloc (sizeof (md5info));
+  md5MeshInfo->fileVersion = fileVersion;
+  md5MeshInfo->numJoints = numJoints;
+  md5MeshInfo->numMeshes = numMeshes;
+  return md5MeshInfo;
+}
+pskeleton md5meshfile_loadSkeleton (pmd5meshfile meshfile)
+{
+  FILE *fp = meshfile->fp;
+  char token[25];
+  char tmpLine[255];
+  char *line = NULL;
+  size_t length = 0;
+  /* to the begining of the file */
+  rewind (fp);
+  pskeleton newSkeleton = getNewSkeleton (0);
+  newSkeleton->name = md5basename (meshfile->filename);
   /*
    *  Parse joints 
    */
-  char tmpLine[255];
-  parseline (fp, &line, &length);
-  if (sscanf (line, "%s %s", &token, &tmpLine) == 2)
-    checkToken (token, "joints", 6);
-  else
-    {
-      fprintf (stderr, "Error parsing beginig of joints section\n");
-      exit (EXIT_FAILURE);
-    }
-#ifdef DEBUG_FILE 
-  printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
-  printf ("DGB-MD5MESH_LOADFILE: tmpLine: %s\n", tmpLine);
-#endif
+  do 
+    {  
+      if (parseline (fp, &line, &length) == -1)
+	{
+	  fprintf (stderr, "Error parsing beginig of joints section.  Check file format.\n");
+	  return NULL;
+	}
+    } while (sscanf (line, "joints %s", &token, &tmpLine) != 1);
   free (line);
   line = NULL;
 
@@ -200,69 +199,151 @@ pskeleton md5mesh_loadfile (char * fn)
   float qz;     /*  Orientation Z  */
   float qw;     /*  W component im told to calculate  */
   int ret;
-  for ( ; jointsParsed < md5meshanimal->numJoints; ++jointsParsed)
+  do
     {
+
       parseline (fp, &line, &length);
+      printf ("Parsing line: %s\n", line);
       memset (jN, '\n', 50);
       ret = sscanf (line, "%s %d ( %f %f %f ) ( %f %f %f )",
 		    &jN,  &jP, &px, &py, &pz, &qx, &qy, &qz);
-#ifdef DEBUG_FILE 
-	printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
-	printf ("DGB-MD5MESH_LOADFILE: Joint: %s %d ( %.10f %.10f %.10f ) ( %.10f %.10f %.10f )\n",
-		jN, jP, px, py, pz, qx, qy, qz);
-#endif
-	if (ret != 8)
+      if (ret == 8)
+	{
+	  skeletonAddJoint (newSkeleton, jN, jP, px, py, pz, qz, qy, qz);	  
+	}
+      else if ( sscanf (line, "%s", &token) == 1)
+	{
+	  if (checkToken (token, "}", 1) == -1)
+	    {
+	      free (line);
+	      line = NULL;
+	      return NULL;
+	    }
+	  else
+	    {
+	      break;
+	    }
+	}
+      else
 	{
 	  fprintf (stderr, "Error Parsing joint #%d\n sscanf ret: %d\n",jointsParsed, ret); 
-	  exit (EXIT_FAILURE);
+	  free (line);
+	  line = NULL;
+	  return NULL;
 	}
-	
-	/*
-	  printf ("Joint: %s %hd ( %.10f %.10f %.10f ) ( %.10f %.10f %.10f )\n",
-		jN,  jP, px, py, pz, qx, qy, qz);
-	*/
-	
-	skeletonAddJoint (newSkeleton, jN, jP, px, py, pz, qz, qy, qz);
-    }
-
-  /*
-   * Parse end of joint section
-   */
-  parseline (fp, &line, &length);
-  if (sscanf (line, "%s", &token) == 1)
-    checkToken (token, "}", 1);
-  else
-    {
-      fprintf (stderr, "Error parsing closing joint bracket\n");
-      exit (EXIT_FAILURE);
-    }
 #ifdef DEBUG_FILE 
-  printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
-#endif
-  free (line);
-  line = NULL;
-  
+      printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
+      printf ("DGB-MD5MESH_LOADFILE: Joint: %s %d ( %.10f %.10f %.10f ) ( %.10f %.10f %.10f )\n",
+	      jN, jP, px, py, pz, qx, qy, qz);
+#endif	      
+      free (line);
+      line = NULL;
+    } while (1);
+  return newSkeleton;
+}
+pmesh md5meshfile_loadMesh (pmd5meshfile meshfile, int meshnumber)
+{
+}
+pmd5meshfile md5meshfile_open (char *filename)
+{
+  FILE * fp;
+  pmd5meshfile meshfile;
+  fp = fopen (filename, "r");
+  if (fp == NULL)
+    {
+      fprintf (stderr, "Error opening file \"%s\"\n", filename);
+      return NULL;
+    }
+  meshfile = (pmd5meshfile) malloc (sizeof (md5meshfile));
+  meshfile->filename = (char *) malloc (sizeof (strlen(filename) +1));
+  meshfile->fp = fp;
+  strcpy (meshfile->filename, filename);
+  return meshfile;
+}
+void md5meshfile_close (pmd5meshfile meshfile)
+{
+  fclose (meshfile->fp);
+}
+
+#ifdef NOREADER
+/* This is for reference only Transitioning to functions above*/
+void md5mesh_loadfile (char * fn, ppskeleton retSkeleton, ppmesh retMeshes )
+{
   /*
    * Parse Mesh sections
    */
+  int mdx;
+  for (mdx = 0; mdx < numMeshes; mdx++)
+    {
+      /*
+       * Parse Decleration Mesh token "mesh {"
+       */
+      parseline (fp, &line, &length);
+      if (sscanf (line, "%s %s", &token, &tmpLine) == 2) 
+	{
+	  checkToken (token, "mesh", 4);
+	  checkToken (tmpLine, "{", 1);
+	}
+      else
+	{
+	  fprintf (stderr, "Error parsing Opening mesh decleration.\n");
+	  exit (EXIT_FAILURE);
+	}
+#ifdef DEBUG_FILE 
+      printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
+#endif
+      free (line);
+      line = NULL;
+      /*
+       *  Parse shader name
+       */
+      parseline (fp, &line, &length);
+      if (sscanf (line, "%s %s", &token, &tmpLine) == 2) 
+	{
+	  checkToken (token, "shader", 6);
+	}
+      else
+	{
+	  fprintf (stderr, "Error parsing Opening mesh decleration.\n");
+	  exit (EXIT_FAILURE);
+	}
+#ifdef DEBUG_FILE 
+      printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
+#endif
+      free (line);
+      line = NULL;      
+      
+      /*
+       * Done Parsing Mesh decleration
+       */
+      parseline (fp, &line, &length);
+      if (sscanf (line, "%s", &token) == 1) 
+	{
+	  checkToken (token, "{", 1);
+	}
+      else
+	{
+	  fprintf (stderr, "Error parsing Closing mesh decleration.\n");
+	  exit (EXIT_FAILURE);
+	}
+#ifdef DEBUG_FILE 
+      printf ("DGB-MD5MESH_LOADFILE: line: %s", line);
+#endif
+      free (line);
+      line = NULL;
+            
+    }
 
-  /*
-   * Done Parsing 
-   */
-
-  free (md5meshanimal);
   newSkeleton->name = md5basename (fn);
-
-  return newSkeleton;
 }
-
+#endif
 static char * md5basename (char * name)
 {
   char * basename;
   char * backtick;
   size_t base_len;
   if ( ((backtick = strrchr (name, '\\')) != NULL) || ((backtick = strrchr (name, '/')) != NULL) )
-       backtick += 1;
+    backtick += 1;
   else 
     backtick = name;
   base_len = strlen (backtick) - strlen (strrchr (name, '.'));
