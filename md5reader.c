@@ -213,7 +213,9 @@ pskeleton md5meshfile_loadSkeleton (pmd5meshfile meshfile)
     {
 
       parseline (fp, &line, &length);
+#ifdef DEBUG_FILE 
       printf ("Parsing line: %s\n", line);
+#endif
       memset (jN, '\n', 50);
       ret = sscanf (line, "%s %d ( %f %f %f ) ( %f %f %f )",
 		    &jN,  &jP, &px, &py, &pz, &qx, &qy, &qz);

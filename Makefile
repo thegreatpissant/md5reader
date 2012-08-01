@@ -1,13 +1,13 @@
 makefile:
 
 DEBUG_FLAG = -g
-ALL_EXECS = 
 TEST_EXECS = md5reader_test skeleton_test
+ALL_EXECS = $(TEST_EXECS) modelrender
 OBJ_FILES = md5reader.o skeleton.o model.o mesh.o
 GLLIBS = -lGL -lglut -lGLU
 EDITOR_MESS =
 
-all: $(ALL_EXECS) $(TEST_EXECS)
+all: $(ALL_EXECS)
 
 objs: $(OBJ_FILES)
 
@@ -35,4 +35,4 @@ modelrender: modelrender.c md5reader.o skeleton.o model.o mesh.o
 tests: $(TEST_EXECS)
 
 clean: 
-	rm -f $(TEST_EXECS) $(OBJ_FILES) $(EDITOR_MESS)
+	rm -f $(ALL_EXECS) $(OBJ_FILES) $(EDITOR_MESS)
