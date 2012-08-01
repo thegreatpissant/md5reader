@@ -1,7 +1,6 @@
 /* Render md5 models, specifically those from doom3 */
 
-#include "../md5reader/md5reader.h"
-
+#include "model.h"
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include <GL/glut.h>
@@ -14,7 +13,7 @@
 
 #define GWH 800
 
-pskeleton mySkeleton;
+pmodel myModel;
 
 #define ZCORD -50.0
 #define XCORD 0.0
@@ -43,14 +42,14 @@ void glut_display_func (void)
     glBegin (GL_LINES);
     glColor3f( 1.0, 1.0f, 1.0f);
     int dxi;
-    for (dxi = 2; dxi < mySkeleton->numJoints; dxi++)
+    for (dxi = 2; dxi < myModel->skel->numJoints; dxi++)
       {
-	glVertex3f (mySkeleton->joints[dxi]->parent->posX,
-		    mySkeleton->joints[dxi]->parent->posY,
-		    mySkeleton->joints[dxi]->parent->posZ);
-	glVertex3f (mySkeleton->joints[dxi]->posX,
-		    mySkeleton->joints[dxi]->posY,
-		    mySkeleton->joints[dxi]->posZ);
+	glVertex3f (myModel->skel->joints[dxi]->parent->posX,
+		    myModel->skel->joints[dxi]->parent->posY,
+		    myModel->skel->joints[dxi]->parent->posZ);
+	glVertex3f (myModel->skel->joints[dxi]->posX,
+		    myModel->skel->joints[dxi]->posY,
+		    myModel->skel->joints[dxi]->posZ);
       }
 
     glEnd ();
@@ -142,8 +141,7 @@ int main (int argc, char ** argv)
       fprintf (stderr, "File name not specified\n");
       exit (EXIT_FAILURE);
     }
-  mySkeleton = md5mesh_loadfile (argv[1]);
-
+  myModel = loadModel (argv[1]);
   glutInit (&argc, argv);
   glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize (GWH, GWH);
@@ -158,6 +156,6 @@ int main (int argc, char ** argv)
   glutMouseFunc   (glut_mouse_func);
   glutMotionFunc  (glut_motion_func);
   glutMainLoop ();
-  skeletonCleanUp (mySkeleton);
+  modelCleanUp(myModel);
   return 0;
 }

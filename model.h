@@ -1,6 +1,8 @@
 /** model.h
  *  creates a model based on the requested asset
  */
+#ifndef __MODEL_H__
+#define __MODEL_H__
 
 /* Base item of all models */
 #include "skeleton.h"  
@@ -11,6 +13,9 @@
 typedef struct
 {
   pskeleton skel;
-  pmesh mesh;
-} model;
+  pmesh baseMesh;
+} model, *pmodel;
 
+pmodel loadModel (char * resourceName);
+void modelCleanUp (pmodel rmmodel);
+#endif

@@ -21,7 +21,8 @@ pskeleton getNewSkeleton (int maxJoints)
 
 void printSkeleton (pskeleton skel)
 {
-  printf ("Printing skeleton %s\n", skel->name );
+  printf ("Printing skeleton\n");
+  /*  printf ("Printing skeleton %s\n", skel->name ); */
   int idx, idy;
   printf ("Number of joints: %d\n", skel->numJoints);
   for (idx = 0; idx < skel->numJoints; idx++)

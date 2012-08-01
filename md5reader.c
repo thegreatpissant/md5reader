@@ -37,6 +37,7 @@ static int parseline (FILE *fp, char **line, size_t *length)
 {
   size_t ret = 0;
   int blank = 1;
+  *line = NULL;
   while (blank == 1) 
     {
       ret = getline (line, length, fp);
@@ -111,6 +112,7 @@ pmd5info md5meshfile_loadinfo (pmd5meshfile meshfile)
   if (sscanf (line, "commandline %s",&commandline) != 1) 
     {
       fprintf (stderr, "Error reading commandline\n");
+      free (line);
       return NULL;
     }
 #ifdef DEBUG_FILE
@@ -145,6 +147,7 @@ pmd5info md5meshfile_loadinfo (pmd5meshfile meshfile)
     {
       fprintf (stderr, "Error parsing number of meshes\n");
       fprintf (stderr, "line: %s", line);
+      free (line);
       return NULL;
     }
 #ifdef DEBUG_FILE 
@@ -176,9 +179,16 @@ pskeleton md5meshfile_loadSkeleton (pmd5meshfile meshfile)
    */
   do 
     {  
-      if (parseline (fp, &line, &length) == -1)
+      if (line != NULL) 
+	{
+	  free (line);
+	  line = NULL;
+	}
+    if (parseline (fp, &line, &length) == -1)
 	{
 	  fprintf (stderr, "Error parsing beginig of joints section.  Check file format.\n");
+	  free (line);
+	  line = NULL;
 	  return NULL;
 	}
     } while (sscanf (line, "joints %s", &token, &tmpLine) != 1);
@@ -221,6 +231,8 @@ pskeleton md5meshfile_loadSkeleton (pmd5meshfile meshfile)
 	    }
 	  else
 	    {
+	      free (line);
+	      line = NULL;
 	      break;
 	    }
 	}
@@ -248,21 +260,26 @@ pmd5meshfile md5meshfile_open (char *filename)
 {
   FILE * fp;
   pmd5meshfile meshfile;
+  size_t fnameLen;
   fp = fopen (filename, "r");
   if (fp == NULL)
     {
       fprintf (stderr, "Error opening file \"%s\"\n", filename);
       return NULL;
     }
+  fnameLen = strlen(filename);
   meshfile = (pmd5meshfile) malloc (sizeof (md5meshfile));
-  meshfile->filename = (char *) malloc (sizeof (strlen(filename) +1));
+  meshfile->filename = (char *) malloc (fnameLen+1);
+  meshfile->filename[fnameLen] = '\0';
   meshfile->fp = fp;
-  strcpy (meshfile->filename, filename);
+  strncpy (meshfile->filename, filename,fnameLen);
   return meshfile;
 }
 void md5meshfile_close (pmd5meshfile meshfile)
 {
   fclose (meshfile->fp);
+  free (meshfile->filename);
+  free (meshfile);
 }
 
 #ifdef NOREADER
@@ -339,16 +356,18 @@ void md5mesh_loadfile (char * fn, ppskeleton retSkeleton, ppmesh retMeshes )
 #endif
 static char * md5basename (char * name)
 {
-  char * basename;
-  char * backtick;
-  size_t base_len;
-  if ( ((backtick = strrchr (name, '\\')) != NULL) || ((backtick = strrchr (name, '/')) != NULL) )
-    backtick += 1;
-  else 
-    backtick = name;
-  base_len = strlen (backtick) - strlen (strrchr (name, '.'));
-  basename = (char *) malloc (base_len +1);
-  strncpy (basename, backtick, base_len);
-  basename[base_len] = '\0';
-  return basename;
+  char * basen;
+  char * bname;
+  size_t nlen;
+    
+  if ( (basen = basename (name)) != NULL)
+    {
+      nlen = strlen (basen);
+      bname = (char *) malloc (nlen+1);
+      bname[nlen] = '\0';
+      strncpy (bname, basen, nlen);
+      return bname;
+    }
+
+  return NULL;
 }

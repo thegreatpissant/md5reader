@@ -7,7 +7,6 @@
 /**
  *  As skeleton becomes more complete, these will disapear.
  */
-
 typedef struct
 {
   float x, y, z;
@@ -25,10 +24,6 @@ typedef struct
   float posx, posy, posz;
 } weight;
 
-  
-typedef enum
- { MD5
- } _meshformat;
 typedef struct 
 {
   char *name;
@@ -38,8 +33,8 @@ typedef struct
   tri *tris;
   vert *verts;
   weight *weights;
-
-  _meshformat meshformat;
 } mesh, *pmesh, **ppmesh;
+
+void meshCleanUp (pmesh rmmesh);
 
 #endif
