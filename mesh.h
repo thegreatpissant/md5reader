@@ -9,30 +9,31 @@
  */
 typedef struct
 {
-  float x, y, z;
-} vert;
+  float s, t;
+  int startweight, countweight;
+} vert, *pvert,**ppvert;
 
 typedef struct
 {
-  int vert1, vert2, vert3;
-} tri;
+  int vert0, vert1, vert2;
+} tri, *ptri, **pptri;
 
 typedef struct
 {
   int joint;
   float bias;
   float posx, posy, posz;
-} weight;
+} weight, *pweight,**ppweight;
 
 typedef struct 
 {
-  char *name;
+  char *shadername;
   int numverts;
   int numtris;
   int numweights;  
-  tri *tris;
-  vert *verts;
-  weight *weights;
+  pptri tris;
+  ppvert verts;
+  ppweight weights;
 } mesh, *pmesh, **ppmesh;
 
 void meshCleanUp (pmesh rmmesh);

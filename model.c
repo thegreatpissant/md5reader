@@ -14,7 +14,7 @@ pmodel loadModel (char * resourceName)
   
   /* Load resource's info */
   pmd5info md5fileinfo;
-  md5fileinfo = md5meshfile_loadinfo (meshfile);
+  md5fileinfo = md5meshfile_loadInfo (meshfile);
 
   /* Load resource's skeleton */
   retModel->skel = md5meshfile_loadSkeleton (meshfile);

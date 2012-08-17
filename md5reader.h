@@ -54,9 +54,9 @@ pskeleton md5meshfile_loadSkeleton (pmd5meshfile meshfile);
 /**
  * Load info from md5 file
  */
-pmd5info md5meshfile_loadinfo (pmd5meshfile meshfile);
+pmd5info md5meshfile_loadInfo (pmd5meshfile meshfile);
 /**
  * Load mesh from file
  */
-pmesh md5meshfile_loadmesh (pmd5meshfile meshfile, int meshnumber);
+pmesh md5meshfile_loadMesh (pmd5meshfile meshfile, int meshnumber);
 #endif

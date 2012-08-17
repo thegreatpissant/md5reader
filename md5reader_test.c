@@ -20,7 +20,7 @@ int main (int argc, char **argv)
  
   printf ("Meshfile info\n");
   pmd5info meshfileinfo;
-  meshfileinfo = md5meshfile_loadinfo (meshfile);
+  meshfileinfo = md5meshfile_loadInfo (meshfile);
   printf ("\tfile version %d\n", meshfileinfo->fileVersion);
   printf ("\tnum joints %d\n", meshfileinfo->numJoints);
   printf ("\tnum meshes %d\n", meshfileinfo->numMeshes);
@@ -36,13 +36,16 @@ int main (int argc, char **argv)
 
   printf ("Print Skeleton\n");
   printSkeleton (mySkeleton);
-  /*
-    ppmesh     myMeshes;
-    md5mesh_loadfile ( argv[1], &mySkeleton, &myMeshes );
-  */
-  /*
-    printSkeleton (*mySkeleton);
-  */
+  
+  printf ("Loading meshes\n");
+  int idx = 0;
+  for (; idx < meshfileinfo->numMeshes; idx++)
+    {
+      pmesh curmesh = md5meshfile_loadMesh (meshfile, idx);
+    }
+  
+  
+
   md5meshfile_close (meshfile);
   return 0;
 }
