@@ -7,7 +7,7 @@ OBJ_FILES = md5reader.o skeleton.o model.o mesh.o
 GLLIBS = -lGL -lglut -lGLU
 EDITOR_MESS =
 
-all: $(ALL_EXECS)
+all: $(ALL_EXECS) $(OBJ_FILES)
 
 objs: $(OBJ_FILES)
 
@@ -26,8 +26,8 @@ mesh.o: mesh.c mesh.h
 md5reader.o: md5reader.c md5reader.h model.h model_formats.h mesh.h
 	gcc $(DEBUG_FLAG) -c md5reader.c
 
-md5reader_test: md5reader.o skeleton.o md5reader_test.c 
-	gcc $(DEBUG_FLAG) -o md5reader_test md5reader_test.c md5reader.o skeleton.o
+md5reader_test: md5reader.o skeleton.o mesh.o md5reader_test.c 
+	gcc $(DEBUG_FLAG) -o md5reader_test md5reader_test.c md5reader.o skeleton.o mesh.o
 
 modelrender: modelrender.c md5reader.o skeleton.o model.o mesh.o
 	gcc $(DEBUG_FLAG) -I. $(LIBS) $(GLLIBS) -o modelrender modelrender.c md5reader.o skeleton.o model.o mesh.o

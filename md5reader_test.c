@@ -42,10 +42,8 @@ int main (int argc, char **argv)
   for (; idx < meshfileinfo->numMeshes; idx++)
     {
       pmesh curmesh = md5meshfile_loadMesh (meshfile, idx);
+      printMesh (curmesh);
     }
-  
-  
-
   md5meshfile_close (meshfile);
   return 0;
 }

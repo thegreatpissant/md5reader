@@ -37,5 +37,6 @@ typedef struct
 } mesh, *pmesh, **ppmesh;
 
 void meshCleanUp (pmesh rmmesh);
+void printMesh (pmesh printingMesh);
 
 #endif
